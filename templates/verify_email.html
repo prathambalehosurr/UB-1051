@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Email | Krishi Mitra</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), 
+                  url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2832&q=80');
+      background-size: cover;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .verify-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      max-width: 400px;
+      width: 100%;
+    }
+    .verify-header {
+      background: #2e7d32;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 15px 15px 0 0;
+    }
+    .verify-form {
+      padding: 30px;
+    }
+    .code-input {
+      font-size: 24px;
+      letter-spacing: 5px;
+      text-align: center;
+    }
+    .btn-verify {
+      background: #2e7d32;
+      color: white;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="verify-container">
+    <div class="verify-header">
+      <h2>📧 Verify Email</h2>
+    </div>
+    
+    <div class="verify-form">
+      {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+      {% endif %}
+      
+      <p>Enter verification code sent to:<br><strong>{{ email }}</strong></p>
+      
+      <form method="POST">
+        <div class="mb-3">
+          <input type="text" class="form-control code-input" name="verification_code" 
+                 maxlength="6" pattern="[0-9]{6}" required autofocus>
+        </div>
+        
+        <button type="submit" class="btn btn-verify">Verify</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

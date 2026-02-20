@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Farmer Chatbot (Gemini)</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body style="font-family:Arial;margin:20px;">
+  <h2>🌾 Farmer Chatbot — Gemini (OpenRouter)</h2>
+
+  <div id="chat-box" style="border:1px solid #ccc;padding:10px;width:60%;height:300px;overflow-y:auto;"></div>
+
+  <form id="chat-form">
+    <input type="text" id="user_input" name="user_input" placeholder="Ask about crops, weather, etc..." required>
+    <select id="lang" name="lang">
+      <option value="en">English</option>
+      <option value="hi">Hindi</option>
+      <option value="kn">Kannada</option>
+    </select>
+    <button type="submit">Send</button>
+  </form>
+
+  <hr>
+  <h3>📸 Upload Crop Image</h3>
+  <input type="file" id="imageInput" name="image">
+  <button id="uploadBtn">Analyze Image</button>
+
+  <script>
+    $('#chat-form').submit(function(e){
+      e.preventDefault();
+      $.post('/chat', $(this).serialize(), function(data){
+        $('#chat-box').append('<p><b>You:</b> ' + $('#user_input').val() + '</p>');
+        $('#chat-box').append('<p><b>Bot:</b> ' + data.reply + '</p>');
+        if (data.voice) {
+          var audio = new Audio(data.voice);
+          audio.play();
+        }
+        $('#user_input').val('');
+      });
+    });
+
+    $('#uploadBtn').click(function(){
+      var formData = new FormData();
+      formData.append('image', $('#imageInput')[0].files[0]);
+      formData.append('lang', $('#lang').val());
+
+      $.ajax({
+        url: '/upload',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(data){
+          if (data.error) {
+            alert(data.error);
+          } else {
+            $('#chat-box').append('<p><b>🖼 Image Analysis:</b> ' + data.reply + '</p>');
+            if (data.voice) {
+              var audio = new Audio(data.voice);
+              audio.play();
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
