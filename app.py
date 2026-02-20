@@ -6,6 +6,9 @@ import threading
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+from dotenv import load_dotenv
+load_dotenv()
+
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "krishi_secret_key")
 
