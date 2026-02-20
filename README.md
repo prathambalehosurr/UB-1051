@@ -3,7 +3,7 @@
 **Krishi Mitra** is an AI-powered digital companion designed specifically for Indian farmers. It leverages state-of-the-art Generative AI (Google Gemini 2.0 Flash) to provide instant, localized advice on crop management, pest control, weather guidance, and market information.
 
 The platform is built to be accessible, supporting multiple regional languages and offering both text and voice-mased interactions to bridge the digital divide in agriculture.
-
+ 
 ---
 
 ## 🚀 Key Features
