@@ -21,13 +21,25 @@ EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "")
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 
-# Ensure folders exist
-os.makedirs("static", exist_ok=True)
-os.makedirs("static/uploads", exist_ok=True)
-os.makedirs("static/voices", exist_ok=True)
+# Handle storage for Serverless environments (like Vercel)
+IS_VERCEL = os.getenv("VERCEL") == "1"
 
-# Database setup
-DB_PATH = "krishi.db"
+if IS_VERCEL:
+    # Use /tmp for writable files in serverless
+    BASE_DIR = "/tmp"
+    DB_PATH = os.path.join(BASE_DIR, "krishi.db")
+    UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
+    VOICES_DIR = os.path.join(BASE_DIR, "voices")
+else:
+    # Use local directory for traditional hosting
+    BASE_DIR = os.getcwd()
+    DB_PATH = "krishi.db"
+    UPLOADS_DIR = "static/uploads"
+    VOICES_DIR = "static/voices"
+
+# Ensure folders exist
+os.makedirs(UPLOADS_DIR, exist_ok=True)
+os.makedirs(VOICES_DIR, exist_ok=True)
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     conn.execute('''CREATE TABLE IF NOT EXISTS users
@@ -126,7 +138,7 @@ def text_to_speech_simple(text, lang="en"):
         
         lang_code = language_map.get(lang, "en")
         filename = f"{uuid.uuid4().hex}.mp3"
-        filepath = os.path.join("static/voices", filename)
+        filepath = os.path.join(VOICES_DIR, filename)
         
         text = text.strip()
         if not text:
@@ -466,7 +478,7 @@ def chat():
     voice_thread.start()
     voice_thread.join(timeout=10)
     
-    voice_url = f"/static/voices/{voice_filename}" if voice_filename else None
+    voice_url = f"/voices/{voice_filename}" if voice_filename else None
 
     save_chat_message(
         session_id=session['current_session_id'],
@@ -494,7 +506,7 @@ def upload_image():
         return jsonify({"reply": "ದಯವಿಟ್ಟು ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.", "voice": None})
 
     filename = f"{uuid.uuid4().hex}_{image.filename}"
-    filepath = os.path.join("static/uploads", filename)
+    filepath = os.path.join(UPLOADS_DIR, filename)
     image.save(filepath)
 
     prompt = f"A farmer uploaded a crop image named {image.filename}. Analyze this image and describe what crop it may be, identify any visible diseases or pests, and suggest remedies in {lang} language."
@@ -510,7 +522,7 @@ def upload_image():
     voice_thread.start()
     voice_thread.join(timeout=10)
     
-    voice_url = f"/static/voices/{voice_filename}" if voice_filename else None
+    voice_url = f"/voices/{voice_filename}" if voice_filename else None
 
     save_chat_message(
         session_id=session['current_session_id'],
@@ -563,6 +575,16 @@ def rename_session(session_id):
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
+
+@app.route('/uploads/<filename>')
+def serve_upload(filename):
+    from flask import send_from_directory
+    return send_from_directory(UPLOADS_DIR, filename)
+
+@app.route('/voices/<filename>')
+def serve_voice(filename):
+    from flask import send_from_directory
+    return send_from_directory(VOICES_DIR, filename)
 
 # ---------------- RUN APP ----------------
 if __name__ == "__main__":
