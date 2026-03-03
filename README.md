@@ -120,7 +120,7 @@ The platform is built to be accessible, supporting multiple regional languages a
 ---
 
 ## 📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the LICENSE file for details....
 
 ---
 
